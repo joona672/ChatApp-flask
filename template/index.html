@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>ChatApp</title>
+        <link rel="icon" type="image/x-icon" href="favicon.ico">
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/css/bootstrap.min.css" rel="stylesheet">
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Faster+One&display=swap" rel="stylesheet">
+        <style>
+            @media only screen and (max-width: 600px) {
+                #formi {
+                    margin: auto;
+                    width: 50%;
+                    padding: 10px;
+                }
+                #Cardi {
+                    background-color: transparent;
+                    max-width: 80%;
+                    margin-top: 25%
+                    
+                }
+                #chat {
+                    overflow-y: scroll;
+                    max-height: 7cm;
+                    min-height: 5cm;
+                }
+                html{
+                    height: 100%;
+                    width: 100%;
+                    background: linear-gradient(0deg, rgba(16,27,27,1) 0%, rgba(110,129,114,1) 100%);
+                    background-repeat:no-repeat;
+                    overflow-x: hidden;
+                    overflow-y: hidden;
+                }
+                body {
+                    background-color: transparent;
+                }
+                ul {
+                    list-style-type: none;
+                }
+                #otsikko{
+                    text-align: center;
+                    font-size: 63px;
+                    color: azure;
+                    font-family: 'Faster One', cursive;
+                }
+
+            }
+            @media only screen and (min-width: 600px) { 
+                #formi {
+                    margin: auto;
+                    width: 50%;
+                    padding: 10px;
+                }
+                #Cardi {
+                    background-color: transparent;
+                    max-width: 40%;
+                    margin-top: 15%
+                    
+                }
+                #chat {
+                    overflow-y: scroll;
+                    max-height: 7cm;
+                    min-height: 5cm;
+                    
+                }
+                html{
+                    height: 100%;
+                    width: 100%;
+                    background: linear-gradient(0deg, rgba(16,27,27,1) 0%, rgba(110,129,114,1) 100%);
+                    background-repeat:no-repeat;
+                    overflow-x: hidden;
+                    overflow-y: hidden;
+                }
+                body {
+                    background-color: transparent;
+                }
+                ul {
+                    list-style-type: none;
+                }
+                #otsikko{
+                    text-align: center;
+                    font-size: 63px;
+                    color: azure;
+                    font-family: 'Faster One', cursive;
+                }
+
+            }
+
+        </style>
+    </head>
+    <body>
+        <h1 id="otsikko">Chat</h1>
+        <div class="container" id="Cardi">
+            <div class="card row" id="chat">
+                <div class="overflow-auto">
+                    <ul id="viestit">
+
+                    </ul>
+                </div>
+            </div>
+            <div class="form-inline row">
+                <input class="col-8" type="text" id="message">
+                <button type="button" class="btn btn-info col-4" id="sendBtn">Send</button>
+            </div>
+            
+        </div>
+    </body>
+    <script>
+        function Name(){
+            var name = localStorage.getItem("name");
+    
+            if(name == null){
+                name = prompt("Please enter you username");
+                localStorage.setItem("name", name);
+            }
+
+            return name;
+        }
+
+        function sendMessage(){
+            
+            const mess = document.getElementById("message").value;
+            document.getElementById("message").value = "";
+            
+            if(mess != '' && mess != ' ') {
+                var m = new Date();
+                var dateString = m.getUTCFullYear() +"/"+ (m.getUTCMonth()+1) +"/"+ m.getUTCDate() + " " + (m.getUTCHours()+2) + ":" + m.getUTCMinutes();
+                $.post("https://da6a-149-154-127-156.ngrok.io/send",
+                {
+                    message: mess,
+                    username: nimi,
+                    time: dateString
+                }, 
+                function(data, status){
+                    
+                });
+
+                
+
+                
+            }
+        }
+
+        function updateChat(chatit){
+            $("ul").html('');
+            for(var i of chatit){
+                
+                $("ul").append(`<li>${i['time']}&lt;${i['username']}&gt; <b>${i['message']}</b></li>`);
+            }
+        }
+
+        function scrolllaa(){
+            let scroll_to_bottom = document.getElementById('chat');
+            scroll_to_bottom.scrollTop = scroll_to_bottom.scrollHeight;
+        }
+        
+
+        $(document).ready(function(){
+
+            
+            setInterval(function () {
+                $.get("https://da6a-149-154-127-156.ngrok.io/update", function(data, status){
+                    updateChat(data);
+                });
+
+            }, 1000);
+
+            $("#sendBtn").click(function(){
+                sendMessage();
+                setTimeout(function(){
+                    scrolllaa();
+
+                },1000);
+
+            })
+
+
+          
+        });
+
+
+
+        var input = document.getElementById('message');
+        input.addEventListener("keypress", function(event) {
+            // If the user presses the "Enter" key on the keyboard
+            var val = document.getElementById('message').value;
+            if (event.key === "Enter" && val != '') {
+              // Cancel the default action, if needed
+              event.preventDefault();
+              
+              document.getElementById("sendBtn").click();
+            }
+          });
+
+        var nimi = Name();
+        
+
+        
+
+    </script>
+</html>
