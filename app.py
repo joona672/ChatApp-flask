@@ -1,9 +1,13 @@
 
-from flask import Flask , render_template, request
+
+
+from flask import Flask , render_template, request , send_file
+
 
 
 
 viestit = []
+
 
 
 app = Flask(__name__, template_folder='template')
@@ -42,3 +46,8 @@ def update():
         viestit.pop(0)
     
     return viestit
+
+
+@app.route('/owl')
+def send_image():
+    return send_file("owl.png" ,mimetype='image/gif')
